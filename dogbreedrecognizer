@@ -1,0 +1,28 @@
+#!/usr/bin/python3
+import jetson_inference
+import jetson_utils
+import argparse
+
+#seeing what type of dog is in the image
+parser = argparse.ArgumentParser()
+parser.add_argument("filename", type = str, help = "filename of the image to process")
+parser.add_argument("--network", type = str, default = "googlenet", help = "model to use, can be; googlenet, resnet-18, etcetera")
+opt = parser.parse_args()
+#load image and classify the dog
+img = jetson_utils.loadImage(opt.filename)
+net = jetson_inference.imageNet(opt.network)
+class_idx, confidence = net.Classify(img)
+class_description = net.GetClassDesc(class_idx)
+
+#output
+print (confidence)
+print(f"The breed of dog shown is {str(class_description)} (class #tar{str(class_idx)}) having {str(confidence*100)}percent of me being sure")
+if confidence < 0.5:
+    print ("maybe the dog is a mutt")
+#/usr/bin/python3 /home/nvidia/my-recognition/dogbreedrecognizer dogs/(dog name here).jpg
+#cd my-recognition
+if "bull mastiff" in str(class_description) and confidence < 50:
+    print ("maybe the dog is a black mouth cur")
+#/usr/bin/python3 /home/nvidia/my-recognition/dogbreedrecognizer test/(Dog Name)/(Image Name).jpg
+
+
